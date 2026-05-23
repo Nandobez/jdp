@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# jdp launcher — picks the shaded jar built by `mvn package`.
+DIR="$(cd "$(dirname "$0")" && pwd)"
+JAR="$DIR/target/jdp.jar"
+if [ ! -f "$JAR" ]; then
+  echo "build first: (cd $DIR && mvn -q -DskipTests package)" >&2
+  exit 1
+fi
+exec java -jar "$JAR" "$@"
