@@ -8,54 +8,54 @@ public class Equivalence {
     public record Class(String category, String description, List<String> gas) {}
 
     private static final List<Class> CLASSES = List.of(
-        new Class("logger-impl", "implementação de logging (use só 1)", List.of(
+        new Class("logger-impl", "logging implementation (use only 1)", List.of(
             "org.apache.logging.log4j:log4j-core",
             "ch.qos.logback:logback-classic",
             "org.slf4j:slf4j-simple",
             "org.slf4j:slf4j-jdk14",
             "org.apache.logging.log4j:log4j-slf4j-impl"
         )),
-        new Class("jwt", "biblioteca JWT (use só 1)", List.of(
+        new Class("jwt", "JWT library (use only 1)", List.of(
             "io.jsonwebtoken:jjwt-api",
             "com.nimbusds:nimbus-jose-jwt",
             "com.auth0:java-jwt",
             "org.bitbucket.b_c:jose4j"
         )),
-        new Class("json-serializer", "biblioteca de serialização JSON (use só 1 geralmente)", List.of(
+        new Class("json-serializer", "JSON serialization library (use only 1, usually)", List.of(
             "com.fasterxml.jackson.core:jackson-databind",
             "com.google.code.gson:gson",
             "jakarta.json.bind:jakarta.json.bind-api",
             "com.squareup.moshi:moshi"
         )),
-        new Class("web-framework", "framework web Spring (use só 1)", List.of(
+        new Class("web-framework", "Spring web framework (use only 1)", List.of(
             "org.springframework.boot:spring-boot-starter-web",
             "org.springframework.boot:spring-boot-starter-webflux"
         )),
-        new Class("jpa-provider", "implementação JPA (use só 1)", List.of(
+        new Class("jpa-provider", "JPA implementation (use only 1)", List.of(
             "org.hibernate.orm:hibernate-core",
             "org.hibernate:hibernate-core",
             "org.eclipse.persistence:eclipselink",
             "org.apache.openjpa:openjpa"
         )),
-        new Class("test-framework", "framework de teste (use só 1)", List.of(
+        new Class("test-framework", "test framework (use only 1)", List.of(
             "org.junit.jupiter:junit-jupiter",
             "org.junit.jupiter:junit-jupiter-api",
             "junit:junit",
             "org.testng:testng"
         )),
-        new Class("mock-lib", "biblioteca de mock (geralmente 1)", List.of(
+        new Class("mock-lib", "mock library (typically 1)", List.of(
             "org.mockito:mockito-core",
             "org.mockito:mockito-junit-jupiter",
             "org.easymock:easymock",
             "org.powermock:powermock-api-mockito2"
         )),
-        new Class("http-client", "cliente HTTP (use 1 ou 2 com propósitos diferentes)", List.of(
+        new Class("http-client", "HTTP client (1, or 2 for different purposes)", List.of(
             "com.squareup.okhttp3:okhttp",
             "org.apache.httpcomponents.client5:httpclient5",
             "org.apache.httpcomponents:httpclient",
             "io.github.resilience4j:resilience4j-retrofit"
         )),
-        new Class("validation", "implementação de Bean Validation (use só 1)", List.of(
+        new Class("validation", "Bean Validation implementation (use only 1)", List.of(
             "org.hibernate.validator:hibernate-validator",
             "org.glassfish:jakarta.el"
         ))

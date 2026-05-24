@@ -46,7 +46,7 @@ public class ReplCmd implements Callable<Integer> {
                 .build();
 
             String prompt = "\u001B[33mjdp›[0m ";
-            terminal.writer().println("\u001B[2mjdp REPL — tab para completar, 'exit' para sair.\u001B[0m");
+            terminal.writer().println("\u001B[2mjdp REPL — tab to complete, 'exit' to quit.\u001B[0m");
             showStatus(terminal);
 
             while (true) {

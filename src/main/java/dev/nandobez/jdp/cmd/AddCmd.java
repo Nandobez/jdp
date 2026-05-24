@@ -32,9 +32,9 @@ public class AddCmd implements Callable<Integer> {
     boolean autoYes;
 
     static void printErrorBlock(String reason, String pomPath) {
-        if (reason == null) reason = "build falhou";
+        if (reason == null) reason = "build failed";
         System.out.println();
-        System.out.println(RED + BLD + "  ✗ ERRO" + R + DIM + "  build não passou" + R);
+        System.out.println(RED + BLD + "  ✗ ERROR" + R + DIM + "  build failed" + R);
         System.out.println();
         int width = Math.max(40, Tui.termWidth() - 6);
         for (String paragraph : reason.split("\\n")) {
@@ -43,8 +43,8 @@ public class AddCmd implements Callable<Integer> {
             }
             System.out.println();
         }
-        System.out.println(YLW + "  ↶ revertido " + R + DIM + pomPath + R);
-        System.out.println(DIM + "    use " + R + BLD + "--no-build" + R + DIM + " para forçar" + R);
+        System.out.println(YLW + "  ↶ reverted " + R + DIM + pomPath + R);
+        System.out.println(DIM + "    use " + R + BLD + "--no-build" + R + DIM + " to force" + R);
         System.out.println();
     }
 
@@ -72,7 +72,7 @@ public class AddCmd implements Callable<Integer> {
     private static Central.Hit promptPick(List<Central.Hit> hits) {
         int max = Math.min(hits.size(), 10);
         System.out.println();
-        System.out.println(BLD + "múltiplos matches — escolha um:" + R);
+        System.out.println(BLD + "multiple matches — pick one:" + R);
         for (int i = 0; i < max; i++) {
             var h = hits.get(i);
             String mark = isCanon(h.groupId()) ? YLW + "★" + R : " ";
@@ -82,7 +82,7 @@ public class AddCmd implements Callable<Integer> {
                 Tui.coloredGav(h.groupId(), h.artifactId(), h.latestVersion()));
         }
         System.out.println();
-        System.out.print(DIM + "número (Enter = 1, q = cancelar): " + R);
+        System.out.print(DIM + "number (Enter = 1, q = cancel): " + R);
         try {
             String line = System.console().readLine();
             if (line == null) return null;
@@ -129,7 +129,7 @@ public class AddCmd implements Callable<Integer> {
                 pick = hits.get(0);
             } else {
                 pick = promptPick(hits);
-                if (pick == null) { System.out.println(DIM + "cancelado." + R); return 1; }
+                if (pick == null) { System.out.println(DIM + "cancelled." + R); return 1; }
             }
             c = pick.toCoord();
         }
@@ -145,22 +145,22 @@ public class AddCmd implements Callable<Integer> {
             String coloredNew      = Tui.coloredGa(c.groupId(), c.artifactId());
 
             System.out.println();
-            System.out.println("  " + YLW + BLD + "⚠ conflito de função" + R);
+            System.out.println("  " + YLW + BLD + "⚠ role conflict" + R);
             System.out.println();
-            System.out.println("    " + coloredExisting + DIM + " já está no pom e cumpre o mesmo papel:" + R);
+            System.out.println("    " + coloredExisting + DIM + " already fills the same role:" + R);
             System.out.println("    " + DIM + conflict.category().description() + R);
             System.out.println();
             if (autoYes) {
-                System.out.println("    " + DIM + "--yes: mantendo os dois." + R);
+                System.out.println("    " + DIM + "--yes: keeping both." + R);
             } else if (!canPrompt()) {
-                System.out.println("    " + DIM + "(stdin não é TTY — mantendo os dois)" + R);
+                System.out.println("    " + DIM + "(stdin not a TTY — keeping both)" + R);
             } else {
-                System.out.print("    substituir " + coloredExisting + DIM + " por " + R + coloredNew
-                    + "  " + BLD + "[S/n/m]" + R + DIM + " (m = manter os dois): " + R);
+                System.out.print("    replace " + coloredExisting + DIM + " with " + R + coloredNew
+                    + "  " + BLD + "[Y/n/k]" + R + DIM + " (k = keep both): " + R);
                 String ans = System.console().readLine();
                 ans = ans == null ? "" : ans.trim().toLowerCase();
                 if (ans.equals("n")) {
-                    System.out.println("    " + DIM + "cancelado." + R);
+                    System.out.println("    " + DIM + "cancelled." + R);
                     return 1;
                 }
                 if (ans.isEmpty() || ans.equals("s") || ans.equals("y")) {

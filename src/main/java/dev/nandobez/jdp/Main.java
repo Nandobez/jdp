@@ -10,7 +10,7 @@ import static dev.nandobez.jdp.cmd.Tui.*;
     name = "jdp",
     mixinStandardHelpOptions = true,
     version = "jdp 0.1.0",
-    description = "Java Dependency Pilot — CRUD manager for Maven/Gradle deps with CVE + compat checks.",
+    description = "Java Dependency Pilot — Maven/Gradle dependency manager with CVE + role-conflict + verify chain.",
     subcommands = {
         ListCmd.class, SearchCmd.class, AddCmd.class, RmCmd.class,
         WhyCmd.class, DoctorCmd.class, WeightCmd.class, DiffCmd.class,
@@ -27,7 +27,6 @@ public class Main implements Runnable {
             printHelp();
             System.exit(0);
         }
-        // Intercept "jdp <cmd> --help" / "jdp <cmd> -h" before picocli validates required params.
         for (int i = 1; i < args.length; i++) {
             if (SubHelp.isHelpFlag(args[i])) {
                 if (SubHelp.print(args[0])) System.exit(0);
@@ -42,47 +41,47 @@ public class Main implements Runnable {
 
     private static void printHelp() {
         String[][] CRUD = {
-            {"list",    "ls",     "Tabela de dependências declaradas."},
-            {"search",  "",       "Busca no Maven Central (★ marca grupo canônico)."},
-            {"add",     "",       "Adiciona dependência. Resolve GAV via Central + roda verify chain."},
-            {"rm",      "remove", "Remove por nome curto ou artifactId."},
+            {"list",    "ls",     "Declared dependencies as a table."},
+            {"search",  "",       "Search Maven Central (★ marks canonical groups)."},
+            {"add",     "",       "Add a dependency. Resolves GAV via Central + verify chain."},
+            {"rm",      "remove", "Remove by short name or artifactId."},
         };
         String[][] ANALYSIS = {
-            {"doctor",  "",       "CVEs (OSV.dev) + outdated + regras de incompat + score."},
-            {"why",     "",       "Cadeia transitiva: por que essa dep está no grafo."},
-            {"weight",  "",       "Top jars por tamanho (impacto no fat-jar / cold start)."},
-            {"unused",  "",       "Deps sem import nos .java (heurística)."},
+            {"doctor",  "",       "CVEs (OSV.dev) + outdated + incompat rules + score."},
+            {"why",     "",       "Transitive chain: why is this dep on the graph?"},
+            {"weight",  "",       "Top jars by size (fat-jar / cold-start impact)."},
+            {"unused",  "",       "Deps without matching imports (heuristic)."},
         };
         String[][] PROJECT = {
-            {"init",    "",       "Scaffold projeto Java. Templates: rest-api | batch | lib."},
-            {"diff",    "",       "Release notes / migration links entre duas versões."},
-            {"migrate", "",       "Converte manifesto. Atual: maven → gradle (Kotlin DSL)."},
-            {"repl",    "",       "Shell interativo com tab-complete dos artifacts do Central."},
+            {"init",    "",       "Scaffold a Java project. Templates: rest-api | batch | lib."},
+            {"diff",    "",       "Release-notes / migration links between two versions."},
+            {"migrate", "",       "Convert manifest. Currently: maven → gradle (Kotlin DSL)."},
+            {"repl",    "",       "Interactive shell with Central artifact tab-complete."},
         };
 
         System.out.println();
         System.out.println();
         System.out.println(BLD + "jdp " + R + DIM + "0.1.0" + R
             + " — Java Dependency Pilot");
-        System.out.println(DIM + "  CRUD manager pra deps Maven/Gradle com CVE + compat checks." + R);
+        System.out.println(DIM + "  CRUD manager for Maven/Gradle deps with CVE + compat checks." + R);
         System.out.println();
         System.out.println("  " + DIM + "USAGE" + R);
         System.out.println();
-        System.out.println("    jdp <comando> [opções]    " + DIM + "// comando individual" + R);
-        System.out.println("    jdp repl                  " + DIM + "// modo interativo com autocomplete" + R);
+        System.out.println("    jdp <command> [options]    " + DIM + "// single command" + R);
+        System.out.println("    jdp repl                   " + DIM + "// interactive shell with autocomplete" + R);
         System.out.println();
         System.out.println();
 
-        printGroup("CRUD",            CRUD);
-        printGroup("ANÁLISE",         ANALYSIS);
-        printGroup("PROJETO",         PROJECT);
+        printGroup("CRUD",     CRUD);
+        printGroup("ANALYSIS", ANALYSIS);
+        printGroup("PROJECT",  PROJECT);
 
-        System.out.println("  " + DIM + "FLAGS GLOBAIS" + R);
+        System.out.println("  " + DIM + "GLOBAL FLAGS" + R);
         System.out.println();
-        System.out.println("    -h, --help            ajuda completa do comando (jdp add --help, etc)");
-        System.out.println("    -V, --version         versão");
-        System.out.println("        --no-build        em add/rm: pula verify chain");
-        System.out.println("        " + DIM + "JDP_SKIP_BUILD=1" + R + "  env var equivalente");
+        System.out.println("    -h, --help            full help for a command (jdp add --help, etc)");
+        System.out.println("    -V, --version         show version");
+        System.out.println("        --no-build        on add/rm: skip verify chain");
+        System.out.println("        " + DIM + "JDP_SKIP_BUILD=1" + R + "  env var equivalent");
         System.out.println();
     }
 

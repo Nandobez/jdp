@@ -48,14 +48,14 @@ public class Verify {
         }
 
         lastFailureReason = null;
-        System.out.println("  " + DIM + "verificando build (" + (isMaven ? "maven" : "gradle") + ")…" + R);
+        System.out.println("  " + DIM + "verifying build (" + (isMaven ? "maven" : "gradle") + ")…" + R);
         long total = System.currentTimeMillis();
         for (Step step : steps) {
             int rc = runWithSpinner(projectDir, step);
             if (rc != 0) return rc;
         }
         System.out.println();
-        System.out.println("    " + GRN + "✓" + R + DIM + " concluído em " + (System.currentTimeMillis() - total) + "ms" + R);
+        System.out.println("    " + GRN + "✓" + R + DIM + " completed in " + (System.currentTimeMillis() - total) + "ms" + R);
         return 0;
     }
 
@@ -116,7 +116,7 @@ public class Verify {
         System.out.print("\r\033[2K");
         System.out.println();
         System.out.println("    " + mark + " " + pad(step.label, 8) +
-            (rc == 0 ? GRN + "ok" + R : RED + "falhou" + R) +
+            (rc == 0 ? GRN + "ok" + R : RED + "failed" + R) +
             DIM + "  (" + ms + "ms)" + R);
 
         if (rc != 0) {
@@ -130,15 +130,15 @@ public class Verify {
         Matcher m;
         // "was not found ... cached" → distinct from never-found
         if ((m = Pattern.compile("([^\\s]+:[^\\s]+:jar:[^\\s]+) was not found.*cached").matcher(output)).find())
-            return "artefato " + m.group(1) + " não existe no Maven Central\n(falha cacheada no ~/.m2 — rode `mvn -U` ou apague o diretório do artefato pra reverificar)";
+            return "artifact " + m.group(1) + " not found on Maven Central\n(falha cacheada no ~/.m2 — rode `mvn -U` ou apague o diretório do artifact pra reverificar)";
         if ((m = Pattern.compile("Could not find artifact ([^\\s]+) in").matcher(output)).find())
-            return "artefato " + m.group(1) + " não existe no Maven Central";
+            return "artifact " + m.group(1) + " not found on Maven Central";
         if ((m = Pattern.compile("Failed to read artifact descriptor for ([^:]+:[^:]+:[^:]+:[^\\s]+)").matcher(output)).find())
-            return "descriptor inválido em " + m.group(1) + "\n(o POM do artefato referencia uma versão não publicada)";
+            return "invalid descriptor for " + m.group(1) + "\n(o POM do artifact referencia uma versão não publicada)";
         if (output.contains("COMPILATION ERROR"))
-            return "erro de compilação no projeto (rode `mvn -e` para detalhes)";
+            return "project compilation error (run `mvn -e` for details)";
         if (output.contains("Source option") && output.contains("no longer supported"))
-            return "JDK incompatível com a configuração do projeto";
+            return "JDK incompatible with the project's configuration";
         if ((m = Pattern.compile("Failed to execute goal[^:]*:\\s*([^\\n\\[]+)").matcher(output)).find())
             return m.group(1).trim();
         // Fallback: last [ERROR] line that isn't a hint.
@@ -152,7 +152,7 @@ public class Verify {
                 || body.startsWith("For more") || body.startsWith("[Help"))  continue;
             last = body;
         }
-        return last != null ? last : "build falhou (sem causa identificável)";
+        return last != null ? last : "build failed (no identifiable cause)";
     }
 
     /** Pick a human-readable stage summary from a single Maven log line. */

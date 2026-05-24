@@ -64,7 +64,7 @@ public class WeightCmd implements Callable<Integer> {
             wJ = Math.max(wJ, e.name.length());
             wS = Math.max(wS, sz.length());
         }
-        table(new String[]{"#","jar","tamanho"}, new int[]{wN, wJ, wS}, rows);
+        table(new String[]{"#","jar","size"}, new int[]{wN, wJ, wS}, rows);
         System.out.println(DIM + entries.size() + " jars · total " + human(total) + R);
         return 0;
     }

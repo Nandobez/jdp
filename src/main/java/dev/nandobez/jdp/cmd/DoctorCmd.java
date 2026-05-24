@@ -90,10 +90,10 @@ public class DoctorCmd implements Callable<Integer> {
         }
         if (hasNotes) {
             int[] w = {wPkg, wVer, wCve, wNew, wNote};
-            table(new String[]{"pacote","versão","CVE","novo?","nota"}, w, tableRows);
+            table(new String[]{"package","version","CVE","newer?","note"}, w, tableRows);
         } else {
             int[] w = {wPkg, wVer, wCve, wNew};
-            table(new String[]{"pacote","versão","CVE","novo?"}, w, tableRows);
+            table(new String[]{"package","version","CVE","newer?"}, w, tableRows);
         }
         int score = Math.max(0, 100 - totalCve * 15 - outdated * 3 - incompat * 10);
         String color = score >= 80 ? GRN : (score >= 50 ? YLW : RED);
@@ -101,14 +101,14 @@ public class DoctorCmd implements Callable<Integer> {
             color, score, R, totalCve, outdated, incompat);
 
         if (fix && totalCve > 0) runFix(p.deps(), pom);
-        else if (fix) System.out.println(DIM + "nada para corrigir." + R);
+        else if (fix) System.out.println(DIM + "nothing to fix." + R);
 
         return 0;
     }
 
     private void runFix(List<Coord> deps, Path pom) throws Exception {
         System.out.println();
-        System.out.println(BLD + "Fix mode — buscando versões patched…" + R);
+        System.out.println(BLD + "Fix mode — fetching patched versions…" + R);
         var fixes = new ArrayList<String[]>(); // [oldGav, newVer]
         for (Coord c : deps) {
             var vulns = Osv.query(c);
@@ -120,7 +120,7 @@ public class DoctorCmd implements Callable<Integer> {
                 .orElse(null);
             if (fixed == null) {
                 System.out.println("  " + YLW + "?" + R + " " + Tui.coloredGav(c.groupId(), c.artifactId(), c.version())
-                    + DIM + "  (OSV não publicou versão fixed)" + R);
+                    + DIM + "  (OSV has no fixed version)" + R);
                 continue;
             }
             System.out.println("  " + GRN + "→" + R + " " + Tui.coloredGav(c.groupId(), c.artifactId(), c.version())
@@ -130,10 +130,10 @@ public class DoctorCmd implements Callable<Integer> {
         if (fixes.isEmpty()) return;
         System.out.println();
         if (!autoYes && System.console() != null) {
-            System.out.print("  " + BLD + "aplicar?" + R + DIM + " [s/N]: " + R);
+            System.out.print("  " + BLD + "apply?" + R + DIM + " [s/N]: " + R);
             String ans = System.console().readLine();
             if (ans == null || !ans.trim().equalsIgnoreCase("s")) {
-                System.out.println(DIM + "  abortado." + R);
+                System.out.println(DIM + "  aborted." + R);
                 return;
             }
         }

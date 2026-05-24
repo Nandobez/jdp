@@ -34,7 +34,7 @@ public class ListCmd implements Callable<Integer> {
             wVer = Math.max(wVer, visibleLen(ver));
             wGrp = Math.max(wGrp, grp.length());
         }
-        table(new String[]{"pacote", "versão", "grupo"}, new int[]{wPkg, wVer, wGrp}, rows);
+        table(new String[]{"package", "version", "group"}, new int[]{wPkg, wVer, wGrp}, rows);
         System.out.println(DIM + p.deps().size() + " dependencies · " + pom + R);
         return 0;
     }

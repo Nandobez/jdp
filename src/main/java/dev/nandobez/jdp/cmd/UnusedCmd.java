@@ -19,7 +19,7 @@ public class UnusedCmd implements Callable<Integer> {
     @Option(names = {"-s", "--src"}, defaultValue = "src/main/java")
     Path src;
 
-    @Option(names = "--clean", description = "Prompta para remover cada zumbi detectado.")
+    @Option(names = "--clean", description = "Prompta para remove cada zumbi detectado.")
     boolean clean;
 
     @Option(names = {"-y", "--yes"}, description = "Em --clean: remove todos sem perguntar.")
@@ -56,10 +56,10 @@ public class UnusedCmd implements Callable<Integer> {
         }
 
         if (unused.isEmpty()) {
-            System.out.println(GRN + "no obvious zumbis." + R);
+            System.out.println(GRN + "no obvious zombies." + R);
             return 0;
         }
-        System.out.println(BLD + "Possivelmente sem uso (heurística — confirme antes):" + R);
+        System.out.println(BLD + "Possibly unused (heuristic — verify before removing):" + R);
         var rows = new ArrayList<String[]>();
         int wN = 2, wP = 6, wV = 6, wG = 5;
         for (int i = 0; i < unused.size(); i++) {
@@ -70,7 +70,7 @@ public class UnusedCmd implements Callable<Integer> {
             wN = Math.max(wN, idx.length()); wP = Math.max(wP, pkg.length());
             wV = Math.max(wV, ver.length()); wG = Math.max(wG, grp.length());
         }
-        table(new String[]{"#","pacote","versão","grupo"}, new int[]{wN, wP, wV, wG}, rows);
+        table(new String[]{"#","package","version","group"}, new int[]{wN, wP, wV, wG}, rows);
 
         if (clean) runClean(unused, pom);
         return 0;
@@ -115,11 +115,11 @@ public class UnusedCmd implements Callable<Integer> {
                 continue;
             }
             if (!canPrompt) {
-                System.out.println(DIM + "  (stdin não é TTY — use -y pra confirmar tudo)" + R);
+                System.out.println(DIM + "  (stdin not a TTY — use -y to confirm all)" + R);
                 break;
             }
-            System.out.print("  remover " + Tui.coloredGa(c.groupId(), c.artifactId())
-                + DIM + " ? [s/N/q]: " + R);
+            System.out.print("  remove " + Tui.coloredGa(c.groupId(), c.artifactId())
+                + DIM + " ? [y/N/q]: " + R);
             String ans = System.console().readLine();
             ans = ans == null ? "" : ans.trim().toLowerCase();
             if (ans.equals("q")) break;
@@ -130,6 +130,6 @@ public class UnusedCmd implements Callable<Integer> {
             }
         }
         System.out.println();
-        System.out.println("  " + GRN + removed + R + DIM + " removidos. Rode " + R + BLD + "jdp doctor" + R + DIM + " pra validar." + R);
+        System.out.println("  " + GRN + removed + R + DIM + " removed. Run " + R + BLD + "jdp doctor" + R + DIM + " to validate." + R);
     }
 }

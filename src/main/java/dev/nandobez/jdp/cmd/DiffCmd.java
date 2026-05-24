@@ -28,9 +28,9 @@ public class DiffCmd implements Callable<Integer> {
         String[] vv = range.split("\\.\\.");
         if (vv.length != 2) {
             System.out.println();
-            System.out.println("  " + RED + BLD + "✗ formato inválido" + R);
-            System.out.println("    " + DIM + "esperado: " + R + BLD + "A..B" + R
-                + DIM + "  ex: " + R + BLD + "3.3.4..3.4.0" + R);
+            System.out.println("  " + RED + BLD + "✗ invalid format" + R);
+            System.out.println("    " + DIM + "expected: " + R + BLD + "A..B" + R
+                + DIM + "  e.g. " + R + BLD + "3.3.4..3.4.0" + R);
             return 2;
         }
 
@@ -44,9 +44,9 @@ public class DiffCmd implements Callable<Integer> {
             var hits = Central.search("a:\"" + aId + "\"", 20);
             if (hits.isEmpty()) {
                 System.out.println();
-                System.out.println("  " + RED + BLD + "✗ não encontrado no Maven Central" + R);
-                System.out.println("    " + DIM + "artifact '" + R + BLD + aId + R + DIM + "' não existe." + R);
-                System.out.println("    " + DIM + "use o GAV completo (groupId:artifactId) se for ambíguo." + R);
+                System.out.println("  " + RED + BLD + "✗ not found no Maven Central" + R);
+                System.out.println("    " + DIM + "artifact '" + R + BLD + aId + R + DIM + "' does not exist." + R);
+                System.out.println("    " + DIM + "use a full GAV (groupId:artifactId) if ambiguous." + R);
                 return 2;
             }
             var exact = hits.stream().filter(h -> h.artifactId().equals(aId)).toList();

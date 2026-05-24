@@ -8,7 +8,6 @@ import static dev.nandobez.jdp.cmd.Tui.*;
 /** Per-subcommand custom help renderer. Loaded by Main when --help/-h hits a subcmd. */
 public class SubHelp {
 
-    /** Returns true if printed (recognised subcommand), false otherwise. */
     public static boolean print(String cmd) {
         var entry = HELPS.get(cmd);
         if (entry == null) return false;
@@ -24,22 +23,20 @@ public class SubHelp {
         System.out.println();
         System.out.println("  " + BLD + "jdp " + h.name + R + DIM + "  — " + h.desc + R);
         System.out.println();
-        section("USO", h.uso);
-        if (h.args != null) section("ARGUMENTOS", h.args);
-        section("OPÇÕES", h.opts);
-        if (h.examples != null) section("EXEMPLOS", h.examples);
+        section("USAGE", h.uso);
+        if (h.args != null) section("ARGUMENTS", h.args);
+        section("OPTIONS", h.opts);
+        if (h.examples != null) section("EXAMPLES", h.examples);
     }
 
     private static void section(String title, String[][] rows) {
         System.out.println("  " + DIM + title + R);
         System.out.println();
         if (rows.length == 1 && rows[0].length == 1) {
-            // Single free-form block (USO or EXEMPLOS)
             for (String line : rows[0][0].split("\n")) System.out.println("    " + line);
             System.out.println();
             return;
         }
-        // 2-col aligned: left=flag, right=description (with optional 3rd col default)
         int maxLeft = 0;
         for (String[] r : rows) maxLeft = Math.max(maxLeft, visibleLen(r[0]));
         for (String[] r : rows) {
@@ -61,137 +58,137 @@ public class SubHelp {
     private static final Map<String, Help> HELPS = new LinkedHashMap<>();
     static {
         HELPS.put("list", h("list",
-            "Mostra dependências declaradas como tabela",
-            "jdp list [opções]",
+            "Show declared dependencies as a table",
+            "jdp list [options]",
             null,
             new String[][]{
-                {"-p, --pom <path>", "caminho do pom.xml", "./pom.xml"},
-                {"    --full",       "mostra GA completo (sem encurtar nomes)"},
-                {"-h, --help",       "esta ajuda"},
+                {"-p, --pom <path>", "path to pom.xml", "./pom.xml"},
+                {"    --full",       "show full GA (skip the short-name heuristic)"},
+                {"-h, --help",       "this help"},
             },
             "jdp list\njdp ls --full\njdp list -p ../backend/pom.xml"));
 
         HELPS.put("search", h("search",
-            "Busca no Maven Central com fuzzy match",
-            "jdp search <query> [opções]",
-            new String[][]{ {"<query>", "termo, ex 'jjwt' ou 'starter-data'"} },
+            "Search Maven Central with fuzzy matching",
+            "jdp search <query> [options]",
+            new String[][]{ {"<query>", "search term, e.g. 'jjwt' or 'starter-data'"} },
             new String[][]{
-                {"-n, --limit <N>", "número máximo de resultados", "15"},
-                {"-f, --full",      "mostra artifactId + groupId completos"},
-                {"-h, --help",      "esta ajuda"},
+                {"-n, --limit <N>", "maximum number of results", "15"},
+                {"-f, --full",      "show full artifactId + groupId"},
+                {"-h, --help",      "this help"},
             },
             "jdp search jjwt\njdp search starter-data -n 20\njdp search hibernate --full"));
 
         HELPS.put("add", h("add",
-            "Adiciona dependência + roda verify chain",
-            "jdp add <spec> [opções]",
-            new String[][]{ {"<spec>", "GAV (g:a:v), artifactId, ou short name (ex starter-web)"} },
+            "Add a dependency and run the verify chain",
+            "jdp add <spec> [options]",
+            new String[][]{ {"<spec>", "GAV (g:a:v), artifactId, or short name (e.g. starter-web)"} },
             new String[][]{
-                {"-p, --pom <path>",  "caminho do pom.xml", "./pom.xml"},
-                {"    --version <v>", "força versão específica"},
-                {"    --bom",         "omite <version> (deixa parent BOM ditar)"},
-                {"-y, --yes",         "pula picker e conflito, pega top canonical"},
-                {"    --no-build",    "pula a verify chain (resolve+package+install)"},
-                {"-h, --help",        "esta ajuda"},
+                {"-p, --pom <path>",  "path to pom.xml", "./pom.xml"},
+                {"    --version <v>", "force a specific version"},
+                {"    --bom",         "omit <version> (let parent BOM decide)"},
+                {"-y, --yes",         "skip the picker and conflict prompt; pick top canonical"},
+                {"    --no-build",    "skip the verify chain (resolve+package+install)"},
+                {"-h, --help",        "this help"},
             },
             "jdp add starter-data-jpa\njdp add org.postgresql:postgresql:42.7.4\njdp add jwt -y\njdp add lombok --bom"));
 
         HELPS.put("rm", h("rm",
-            "Remove dependência por short name ou artifactId",
-            "jdp rm <name> [opções]",
-            new String[][]{ {"<name>", "short name ('starter-web') ou artifactId completo"} },
+            "Remove a dependency by short name or artifactId",
+            "jdp rm <name> [options]",
+            new String[][]{ {"<name>", "short name ('starter-web') or full artifactId"} },
             new String[][]{
-                {"-p, --pom <path>", "caminho do pom.xml", "./pom.xml"},
-                {"    --no-build",   "pula verify chain"},
-                {"-h, --help",       "esta ajuda"},
+                {"-p, --pom <path>", "path to pom.xml", "./pom.xml"},
+                {"    --no-build",   "skip the verify chain"},
+                {"-h, --help",       "this help"},
             },
             "jdp rm starter-actuator\njdp rm log4j-core --no-build"));
 
         HELPS.put("doctor", h("doctor",
-            "Health check: CVEs (OSV.dev) + outdated + regras de incompat + score",
-            "jdp doctor [opções]",
+            "Health check: CVEs (OSV.dev) + outdated + incompat rules + score",
+            "jdp doctor [options]",
             null,
             new String[][]{
-                {"-p, --pom <path>", "caminho do pom.xml", "./pom.xml"},
-                {"    --fix",        "sobe versões com CVE para a versão patched"},
-                {"-y, --yes",        "em --fix: aplica sem perguntar"},
-                {"-h, --help",       "esta ajuda"},
+                {"-p, --pom <path>", "path to pom.xml", "./pom.xml"},
+                {"    --fix",        "bump CVE-affected versions to the patched one"},
+                {"-y, --yes",        "on --fix: apply without prompting"},
+                {"-h, --help",       "this help"},
             },
             "jdp doctor\njdp doctor --fix\njdp doctor --fix -y"));
 
         HELPS.put("why", h("why",
-            "Por que esta dependência está no grafo (cadeia transitiva)",
-            "jdp why <name> [opções]",
-            new String[][]{ {"<name>", "artifactId ou parte do nome"} },
+            "Why is this dependency on the graph? (transitive chain)",
+            "jdp why <name> [options]",
+            new String[][]{ {"<name>", "artifactId or part of the name"} },
             new String[][]{
-                {"-d, --dir <path>", "diretório do projeto", "."},
-                {"-h, --help",       "esta ajuda"},
+                {"-d, --dir <path>", "project directory", "."},
+                {"-h, --help",       "this help"},
             },
             "jdp why tomcat\njdp why jackson\njdp why hibernate"));
 
         HELPS.put("weight", h("weight",
-            "Top jars resolvidos por tamanho (impacto no fat-jar / cold start)",
-            "jdp weight [opções]",
+            "Top resolved jars by size (fat-jar / cold-start impact)",
+            "jdp weight [options]",
             null,
             new String[][]{
-                {"-d, --dir <path>", "diretório do projeto", "."},
-                {"-n, --top <N>",    "quantos jars mostrar", "15"},
-                {"-h, --help",       "esta ajuda"},
+                {"-d, --dir <path>", "project directory", "."},
+                {"-n, --top <N>",    "how many jars to show", "15"},
+                {"-h, --help",       "this help"},
             },
             "jdp weight\njdp weight -n 30"));
 
         HELPS.put("unused", h("unused",
-            "Deps declaradas sem import correspondente (heurística)",
-            "jdp unused [opções]",
+            "Declared deps without matching imports (heuristic)",
+            "jdp unused [options]",
             null,
             new String[][]{
-                {"-p, --pom <path>",  "caminho do pom.xml", "./pom.xml"},
-                {"-s, --src <path>",  "diretório com .java", "src/main/java"},
-                {"    --clean",       "prompta pra remover cada zumbi"},
-                {"-y, --yes",         "em --clean: remove todos sem perguntar"},
-                {"-h, --help",        "esta ajuda"},
+                {"-p, --pom <path>",  "path to pom.xml", "./pom.xml"},
+                {"-s, --src <path>",  ".java source dir", "src/main/java"},
+                {"    --clean",       "prompt to remove each zombie"},
+                {"-y, --yes",         "on --clean: remove all without prompting"},
+                {"-h, --help",        "this help"},
             },
             "jdp unused\njdp unused --clean\njdp unused --clean -y"));
 
         HELPS.put("diff", h("diff",
-            "Links de release notes entre duas versões de um artefato",
+            "Release-notes links between two versions of an artifact",
             "jdp diff <artifact> <A..B>",
             new String[][]{
-                {"<artifact>", "artifactId (ou g:a)"},
-                {"<A..B>",     "intervalo de versões, ex 3.3.4..3.4.0"},
+                {"<artifact>", "artifactId (or g:a)"},
+                {"<A..B>",     "version range, e.g. 3.3.4..3.4.0"},
             },
-            new String[][]{ {"-h, --help", "esta ajuda"} },
+            new String[][]{ {"-h, --help", "this help"} },
             "jdp diff starter-data-jpa 3.3.4..3.4.0\njdp diff jjwt-api 0.11.5..0.12.6"));
 
         HELPS.put("migrate", h("migrate",
-            "Converte manifesto entre formatos",
-            "jdp migrate <direction> [opções]",
-            new String[][]{ {"<direction>", "atual: maven->gradle"} },
+            "Convert manifest between formats",
+            "jdp migrate <direction> [options]",
+            new String[][]{ {"<direction>", "currently: maven->gradle"} },
             new String[][]{
-                {"-p, --pom <path>",  "caminho do pom.xml", "./pom.xml"},
-                {"-o, --out <path>",  "arquivo de saída", "build.gradle.kts"},
-                {"-h, --help",        "esta ajuda"},
+                {"-p, --pom <path>",  "path to pom.xml", "./pom.xml"},
+                {"-o, --out <path>",  "output file", "build.gradle.kts"},
+                {"-h, --help",        "this help"},
             },
             "jdp migrate maven->gradle\njdp migrate maven-gradle -o my.gradle.kts"));
 
         HELPS.put("init", h("init",
-            "Scaffold de projeto Java novo",
-            "jdp init <dir> [opções]",
-            new String[][]{ {"<dir>", "diretório do projeto (criado se não existir)"} },
+            "Scaffold a new Java project",
+            "jdp init <dir> [options]",
+            new String[][]{ {"<dir>", "project directory (created if missing)"} },
             new String[][]{
                 {"-t, --template <t>",  "rest-api | batch | lib", "rest-api"},
                 {"    --group <g>",     "groupId", "com.example"},
                 {"    --artifact <a>",  "artifactId", "<dir>"},
-                {"    --java <v>",      "versão do JDK", "17"},
-                {"-h, --help",          "esta ajuda"},
+                {"    --java <v>",      "JDK release", "17"},
+                {"-h, --help",          "this help"},
             },
-            "jdp init meu-api\njdp init worker -t batch --group io.foo\njdp init lib1 -t lib --java 21"));
+            "jdp init my-api\njdp init worker -t batch --group io.foo\njdp init lib1 -t lib --java 21"));
 
         HELPS.put("repl", h("repl",
-            "Shell interativo com tab-complete dos artefatos do Central",
+            "Interactive shell with tab-complete on Central artifacts",
             "jdp repl",
             null,
-            new String[][]{ {"-h, --help", "esta ajuda"} },
-            "jdp repl                          # entra no shell\n# dentro: list / add start<TAB> / search jwt<TAB> / doctor / exit"));
+            new String[][]{ {"-h, --help", "this help"} },
+            "jdp repl                          # enter the shell\n# inside: list / add start<TAB> / search jwt<TAB> / doctor / exit"));
     }
 }

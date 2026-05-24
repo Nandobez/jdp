@@ -1,49 +1,50 @@
 <div align="center">
 
 <pre>
-     ██╗██████╗ ██████╗
-     ██║██╔══██╗██╔══██╗
-     ██║██║  ██║██████╔╝
-██   ██║██║  ██║██╔═══╝
+         ██╗██████╗ ██████╗
+          ██║██╔══██╗██╔══██╗
+          ██║██║  ██║██████╔╝
+    ██   ██║██║  ██║██╔═══╝
 ╚█████╔╝██████╔╝██║
  ╚════╝ ╚═════╝ ╚═╝
 </pre>
 
 ### Java Dependency Pilot
-**Gerente de dependências Maven/Gradle com CVE, conflito de função e verify chain.**
+**Maven/Gradle dependency manager with CVE checks, role-conflict detection and a verify chain.**
 
 [![JDK](https://img.shields.io/badge/JDK-17+-007396?style=for-the-badge&logo=openjdk)](https://openjdk.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](./LICENSE)
 
 </div>
 
-`jdp` faz CRUD de dependências (Maven/Gradle) do lado **didático**: cada
-ação atravessa a lista de equivalências (logger? jpa-provider? web-stack?),
-consulta OSV.dev por CVE, prioriza grupos canônicos (`org.springframework`,
-`org.apache`, etc), e roda uma **verify chain** (`resolve → clean+package →
-install`) com revert automático se quebrar. Picker interativo, autocomplete
-no REPL e tabelas que se adaptam ao terminal.
+`jdp` does Maven/Gradle CRUD with the **didactic** angle: every action
+walks the equivalence catalog (logger? jpa-provider? web-stack?), queries
+OSV.dev for CVEs, prefers canonical groups (`org.springframework`,
+`org.apache`, etc), and runs a **verify chain** (`resolve → clean+package
+→ install`) with automatic rollback on failure. Interactive picker,
+REPL autocomplete and tables that adapt to your terminal width.
 
-## Instalação
+## Install
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Nandobez/jdp/main/install.sh | bash
 ```
 
-Customização:
+Customisation:
 
 ```bash
-# pin de versão
+# version pin
 curl -fsSL https://raw.githubusercontent.com/Nandobez/jdp/main/install.sh | bash -s -- --pin=v0.1.0
 
-# prefix custom
+# custom prefix
 curl -fsSL https://raw.githubusercontent.com/Nandobez/jdp/main/install.sh | bash -s -- --prefix=/usr/local
 ```
 
-Pré-requisitos: **JDK 17+**, **mvn**, **git**.
-Default instala em `~/.local/share/jdp/jdp.jar` + wrapper em `~/.local/bin/jdp`.
+Prerequisites: **JDK 17+**, **mvn**, **git**.
+Default installs to `~/.local/share/jdp/jdp.jar` with a wrapper at
+`~/.local/bin/jdp`.
 
-### Build local
+### Local build
 
 ```bash
 git clone https://github.com/Nandobez/jdp.git
@@ -52,59 +53,59 @@ mvn -DskipTests package
 ./jdp --help
 ```
 
-## Comandos
+## Commands
 
 ```
 CRUD
-  list, ls         tabela de deps declaradas
-  search           Maven Central com ★ canonical
-  add              + verify chain + picker + conflito de função
-  rm, remove       remove com sugestão fuzzy se não achar
+  list, ls         declared deps as a table
+  search           Maven Central with ★ canonical highlight
+  add              + verify chain + picker + role conflict
+  rm, remove       remove with fuzzy suggestions when not found
 
-ANÁLISE
-  doctor           CVE (OSV.dev) + outdated + regras + score
-                   --fix sobe versões com CVE para a versão patched
-  why              cadeia transitiva (`mvn dependency:tree` em árvore bonita)
-  weight           top jars por tamanho (impacto fat-jar / cold start)
-  unused           deps sem import (heurística com whitelist de starters/drivers/agents)
-                   --clean prompta pra remover cada zumbi
+ANALYSIS
+  doctor           CVE (OSV.dev) + outdated + rules + score
+                   --fix bumps CVE deps to the patched version
+  why              transitive chain (mvn dependency:tree, prettified)
+  weight           top jars by size (fat-jar / cold start impact)
+  unused           declared deps without imports (heuristic + whitelist)
+                   --clean prompts to remove each zombie
 
-PROJETO
+PROJECT
   init             scaffold: rest-api | batch | lib
-  diff             release notes / migration links entre 2 versões
+  diff             release-notes / migration links between two versions
   migrate          maven → gradle (Kotlin DSL)
-  repl             shell interativo com tab-complete de artifacts
+  repl             interactive shell with artifact tab-complete
 ```
 
-Ajuda detalhada: `jdp <cmd> --help`.
+Per-command help: `jdp <cmd> --help`.
 
-## Tour rápido
+## Quick tour
 
 ```bash
 # scaffold
-jdp init meu-api -t rest-api --group io.acme
+jdp init my-api -t rest-api --group io.acme
 
-# adicionar — picker se houver múltiplos, ★ canonical no topo
+# add — picker for multiple matches, ★ canonical on top
 jdp add jpa
 jdp add starter-data-jpa
 jdp add ch.qos.logback:logback-classic:1.5.6
 
-# detecta conflito de função
-#   ⚠ conflito de função
-#   org.apache.logging.log4j:log4j-core já cumpre o mesmo papel: logger-impl
-#   substituir log4j-core por logback-classic? [S/n/m]
+# role-conflict detection
+#   ⚠ role conflict
+#   org.apache.logging.log4j:log4j-core already fills the same role: logger-impl
+#   replace log4j-core with logback-classic? [Y/n/k]
 
-# diagnóstico
+# diagnostics
 jdp doctor
-jdp doctor --fix       # sobe pra versão patched do OSV
+jdp doctor --fix       # apply OSV patched versions
 
-# análise
+# analysis
 jdp why tomcat
 jdp weight -n 20
 jdp unused --clean
 ```
 
-## Como funciona
+## How it works
 
 ```
                    ┌─────────────┐
@@ -121,8 +122,8 @@ jdp unused --clean
         └────────┬────────┴───────────────┘
                  ▼
         ┌────────────────────┐
-        │  Equivalence table │   ← detecção de conflito
-        │  Canonical groups  │   ← ranking ★
+        │  Equivalence table │   ← role-conflict detection
+        │  Canonical groups  │   ← ★ ranking
         │  Incompat rules    │   ← jjwt < 0.12, lombok < 1.18.30…
         └─────────┬──────────┘
                   ▼
@@ -133,45 +134,45 @@ jdp unused --clean
         └────────────────────┘
 ```
 
-**Verify chain** (executada após cada `add`/`rm`):
-1. `mvn dependency:resolve` — confirma que o artefato e suas transitivas existem
-2. `mvn clean package -DskipTests` — confirma que ainda compila
-3. `mvn install -DskipTests` — popula `~/.m2` pra próximas reuses
+**Verify chain** (runs after every `add`/`rm`):
+1. `mvn dependency:resolve` — confirms artifact + transitives exist
+2. `mvn clean package -DskipTests` — confirms it still compiles
+3. `mvn install -DskipTests` — populates `~/.m2` for next runs
 
-Falha em qualquer step → **revert automático do pom**. Pule com `--no-build`
-ou `JDP_SKIP_BUILD=1`.
+If any step fails ⇒ **automatic pom rollback**. Skip it with `--no-build`
+or `JDP_SKIP_BUILD=1`.
 
-## Comandos em detalhe
+## Commands in detail
 
 ### `add`
 
-- Curto: `jdp add starter-web` → resolve via Central, prioriza canonical
+- Short: `jdp add starter-web` → resolves via Central, prefers canonical groups
 - GAV: `jdp add org.postgresql:postgresql:42.7.4`
-- Múltiplos hits → **picker numerado** (Enter = canonical, q = cancela)
-- Conflito de função → **prompt de substituição** (S/n/m onde m = manter ambos)
-- `--bom` omite a versão (parent BOM dita)
-- `-y` pula prompts (auto-canonical)
+- Multiple matches → **numbered picker** (Enter = canonical, q = cancel)
+- Role conflict → **replace prompt** (Y/n/k, k = keep both)
+- `--bom` omits the version (parent BOM decides)
+- `-y` skips prompts (auto-canonical)
 
 ### `doctor`
 
-- Consulta **OSV.dev** por CVE em cada GAV+versão
-- Consulta **Central** pela versão mais nova
-- 4 regras hardcoded de incompatibilidade conhecida
+- Queries **OSV.dev** for CVEs against each GAV+version
+- Queries **Central** for the latest published version
+- Four hand-curated incompat rules
 - Score = `100 - 15·CVEs - 3·outdated - 10·incompat`
-- `--fix` baixa versões patched do OSV e aplica
+- `--fix` pulls patched versions from OSV and applies them
 
 ### `unused`
 
-Heurística simples: para cada dep, procura `import <groupId>.*` ou
-substring do artifactId em `src/main/java/**/*.java`. **Whitelist** evita
-falsos positivos:
+Heuristic: for each dep, look for `import <groupId>.*` or the artifactId
+as substring in `src/main/java/**/*.java`. A **whitelist** prevents
+false positives:
 - starters (`spring-boot-starter-*`, autoconfig)
 - JDBC drivers (mysql, postgresql, h2, mariadb, oracle, sqlserver)
 - annotation processors (lombok, mapstruct)
-- logging impls (logback, log4j) — usados via SLF4J facade
+- logging impls (logback, log4j) — used via the SLF4J facade
 - test deps (junit, mockito, assertj, testcontainers)
 
-`--clean` prompta por cada zumbi. `-y` remove tudo silenciosamente.
+`--clean` prompts for each zombie. `-y` removes everything silently.
 
 ### `why`
 
@@ -186,50 +187,58 @@ orders-api
 
 ### `weight`
 
-Resolve `mvn dependency:build-classpath`, soma bytes, mostra top-N. Útil
-pra Lambda / container slim.
+Resolves `mvn dependency:build-classpath`, sums bytes, prints the top-N.
+Useful for Lambda / slim containers.
 
 ### `repl`
 
 ```
 jdp repl
-jdp› add starter-data<TAB>   ← bate no Central, sugere
+jdp› add starter-data<TAB>   ← hits Central, suggests
 jdp› doctor
 jdp› exit
 ```
 
-JLine + picocli + autocomplete dinâmico de artifacts (debounce 3 chars).
+JLine + picocli + dynamic artifact autocomplete (debounce: 3 chars).
 
-## Variáveis de ambiente
+## Environment variables
 
-| Var | Efeito |
+| Var | Effect |
 |---|---|
-| `JDP_SKIP_BUILD=1` | pula verify chain em add/rm |
-| `JDP_NARROW=1` | força layout narrow (sem bordas) |
-| `COLUMNS=80` | limita largura — narrow se tabela passar disso |
+| `JDP_SKIP_BUILD=1` | skip the verify chain on add/rm |
+| `JDP_NARROW=1` | force narrow layout (no borders) |
+| `COLUMNS=80` | width cap — narrow renders when a table exceeds it |
 
-## Layout do projeto
+## Project layout
 
 ```
 jdp/
-├── install.sh                    # installer auto-detecta JDK + mvn
+├── install.sh                    # installer; auto-detects JDK + mvn
 ├── pom.xml                       # build (shaded uber-jar)
 ├── src/main/java/dev/nandobez/jdp/
-│   ├── Main.java                 # entry point + help bonito
+│   ├── Main.java                 # entry point + curated help
 │   ├── core/
-│   │   ├── Coord.java            # GAV + helpers de short name
-│   │   ├── PomReader.java        # parser de pom.xml (resolve ${…})
-│   │   ├── PomWriter.java        # add/remove de <dependency>
-│   │   ├── Equivalence.java      # tabela de equivalência de função
-│   │   └── Verify.java           # verify chain async com spinner
+│   │   ├── Coord.java            # GAV + short-name helpers
+│   │   ├── PomReader.java        # pom.xml parser (resolves ${…})
+│   │   ├── PomWriter.java        # add/remove of <dependency>
+│   │   ├── Equivalence.java      # role-equivalence catalog
+│   │   └── Verify.java           # async verify chain + spinner
 │   ├── sources/
 │   │   ├── Central.java          # Maven Central solrsearch + fuzzy
 │   │   └── Osv.java              # OSV.dev /v1/query
 │   └── cmd/
-│       ├── Tui.java              # tabela adaptativa + cores
-│       ├── SubHelp.java          # help bonito por subcomando
-│       └── *Cmd.java             # 12 comandos
+│       ├── Tui.java              # adaptive table + colour helpers
+│       ├── SubHelp.java          # per-subcommand help
+│       └── *Cmd.java             # 12 commands
 ```
+
+## Contributing
+
+PRs welcome. Easy wins:
+- more incompat rules in `DoctorCmd.RULES`
+- more categories in `Equivalence.CLASSES`
+- more canonical groups in the `CANON` lists (AddCmd / SearchCmd / DiffCmd)
+- more project templates in `InitCmd`
 
 ## License
 

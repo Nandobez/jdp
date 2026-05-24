@@ -40,8 +40,8 @@ public class SearchCmd implements Callable<Integer> {
 
         long canonical = hits.stream().filter(h -> isCanon(h.groupId())).count();
         System.out.println(DIM + hits.size() + " hits · " + YLW + "★" + DIM
-            + " = grupo canônico (" + canonical + ") · "
-            + (full ? "" : "use --full p/ ver groupId completo · ")
+            + " = canonical group (" + canonical + ") · "
+            + (full ? "" : "use --full to see the full groupId · ")
             + "jdp add <artifactId>" + R);
         return 0;
     }
@@ -56,7 +56,7 @@ public class SearchCmd implements Callable<Integer> {
             wV = Math.max(wV, h.latestVersion().length());
             wG = Math.max(wG, h.groupId().length());
         }
-        table(new String[]{"", "artifactId", "versão", "groupId"},
+        table(new String[]{"", "artifactId", "version", "groupId"},
               new int[]{wMark, wA, wV, wG}, rows);
     }
 
@@ -92,7 +92,7 @@ public class SearchCmd implements Callable<Integer> {
             wF = Math.max(wF, b.framework.length());
             wD = Math.max(wD, b.domain.length());
         }
-        table(new String[]{"", "tipo", "versão", "framework", "domínio"},
+        table(new String[]{"", "kind", "version", "framework", "domain"},
               new int[]{wM, wT, wV, wF, wD}, rows);
     }
 

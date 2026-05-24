@@ -27,7 +27,7 @@ public class RmCmd implements Callable<Integer> {
             .findFirst().orElse(null);
         if (match == null) {
             System.out.println();
-            System.out.println("  " + RED + BLD + "✗ não encontrado" + R + DIM + "  '" + name + "' não está no pom" + R);
+            System.out.println("  " + RED + BLD + "✗ not found" + R + DIM + "  '" + name + "' is not in the pom" + R);
             System.out.println();
             // fuzzy suggestions
             var suggestions = p.deps().stream()
@@ -36,14 +36,14 @@ public class RmCmd implements Callable<Integer> {
                 .limit(5)
                 .toList();
             if (!suggestions.isEmpty()) {
-                System.out.println("  " + DIM + "talvez você quis dizer:" + R);
+                System.out.println("  " + DIM + "did you mean:" + R);
                 for (var c : suggestions)
                     System.out.println("    " + Tui.coloredGa(c.groupId(), c.artifactId()));
             } else if (!p.deps().isEmpty()) {
-                System.out.println("  " + DIM + "deps atuais:" + R);
+                System.out.println("  " + DIM + "current deps:" + R);
                 for (var c : p.deps().stream().limit(5).toList())
                     System.out.println("    " + Tui.coloredGa(c.groupId(), c.artifactId()));
-                System.out.println("    " + DIM + "(jdp list pra ver todas)" + R);
+                System.out.println("    " + DIM + "(jdp list to see all)" + R);
             }
             return 2;
         }
